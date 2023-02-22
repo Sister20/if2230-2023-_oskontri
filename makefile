@@ -29,7 +29,10 @@ clean:
 kernel:
 	@$(ASM) $(AFLAGS) $(SOURCE_FOLDER)/kernel_loader.s -o $(OUTPUT_FOLDER)/kernel_loader.o
 # TODO: Compile C file with CFLAGS
+	@$(CC) $(CFLAGS) $(SOURCE_FOLDER)/kernel.c -o $(OUTPUT_FOLDER)/kernel.o
+	@$(ASM) $(AFLAGS) $(SOURCE_FOLDER)/kernel_loader.s -o $(OUTPUT_FOLDER)/kernel_loader.o
 	@$(LIN) $(LFLAGS) bin/*.o -o $(OUTPUT_FOLDER)/kernel
+
 	@echo Linking object files and generate elf32...
 	@rm -f *.o
 
@@ -39,4 +42,14 @@ iso: kernel
 	@cp other/grub1                 $(OUTPUT_FOLDER)/iso/boot/grub/
 	@cp $(SOURCE_FOLDER)/menu.lst   $(OUTPUT_FOLDER)/iso/boot/grub/
 # TODO: Create ISO image
+	genisoimage -R                   \
+	-b boot/grub/grub1         \
+	-no-emul-boot              \
+	-boot-load-size 4          \
+	-A os                      \
+	-input-charset utf8        \
+	-quiet                     \
+	-boot-info-table           \
+	-o bin/OS2023.iso              \
+	bin/iso
 	@rm -r $(OUTPUT_FOLDER)/iso/
