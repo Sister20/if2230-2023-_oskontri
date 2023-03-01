@@ -15,12 +15,13 @@ struct GlobalDescriptorTable global_descriptor_table = {
                 .base_mid = 0,
                 .type_bit = 0,
                 .non_system = 0,
-                .descriptor_type = 0,
-                .descriptor_privilege_level = 0,
-                .segment_present = 0,
-                .descriptor_type_1 = 0,
-                .default_operation_size = 0,
-                .granularity = 0,
+                .dpl = 0,
+                .p = 0,
+                .segment_limit = 0,
+                .avl = 0,
+                .l = 0,
+                .d_b = 0,
+                .g = 0,
                 .base_high = 0
                 
             },
@@ -29,14 +30,15 @@ struct GlobalDescriptorTable global_descriptor_table = {
                 .segment_low = 0xFFFF,
                 .base_low = 0,
                 .base_mid = 0,
-                .type_bit = 0b1010,
+                .type_bit = 0xA,
                 .non_system = 1,
-                .descriptor_type = 1,
-                .descriptor_privilege_level = 0,
-                .segment_present = 1,
-                .descriptor_type_1 = 1,
-                .default_operation_size = 1,
-                .granularity = 1,
+                .dpl = 0,
+                .p = 1,
+                .segment_limit = 0xF,
+                .avl = 0,
+                .l = 0,
+                .d_b = 1,
+                .g = 1,
                 .base_high = 0
 
             },
@@ -45,14 +47,15 @@ struct GlobalDescriptorTable global_descriptor_table = {
                 .segment_low = 0xFFFF,
                 .base_low = 0,
                 .base_mid = 0,
-                .type_bit = 0b0010,
+                .type_bit = 0x2,
                 .non_system = 1,
-                .descriptor_type = 1,
-                .descriptor_privilege_level = 0,
-                .segment_present = 1,
-                .descriptor_type_1 = 0,
-                .default_operation_size = 1,
-                .granularity = 1,
+                .dpl = 0,
+                .p = 1,
+                .segment_limit = 0xF,
+                .avl = 0,
+                .l = 0,
+                .d_b = 1,
+                .g = 1,
                 .base_high = 0
             }
     }
@@ -68,5 +71,7 @@ struct GDTR _gdt_gdtr = {
     //        Use sizeof operator
     .size = sizeof(global_descriptor_table) -1,
     .address = &global_descriptor_table,
+
+    
 };
 

@@ -28,13 +28,14 @@ struct SegmentDescriptor {
     uint8_t type_bit   : 4;
     uint8_t non_system : 1;
     // TODO : Continue GDT definition
-    uint8_t  descriptor_type : 1; // Descriptor Type (0 for System, 1 for Code or Data)
-    uint8_t  descriptor_privilege_level : 2; // Descriptor Privilege Level (0 for Kernel, 3 for User)
-    uint8_t  segment_present : 1; // Segment Present Bit (1 if Segment is Present in Memory)
-    uint8_t  descriptor_type_1 : 1; // Descriptor Type (Code/ Data segment, 1 = code or data)
-    uint8_t  default_operation_size : 1; // Default Operation Size (0 for 16-bit, 1 for 32-bit)
-    uint8_t  granularity : 1;     // Granularity Bit (0 for 1 byte, 1 for 4KB)
-    uint8_t  base_high;   // Base Bits (24-31)
+    uint8_t dpl : 2; 
+    uint8_t p : 1; 
+    uint8_t segment_limit : 4; 
+    uint8_t avl : 1;
+    uint8_t l : 1;
+    uint8_t d_b : 1;
+    uint8_t g : 1;
+    uint8_t base_high : 8;
 
 } __attribute__((packed));
 
