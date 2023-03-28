@@ -1,6 +1,6 @@
 
-#include "stdmem.c"
-#include "portio.c"
+#include "lib-header/stdmem.h"
+#include "lib-header/portio.h"
 #include "lib-header/stdtype.h"
 #include "lib-header/framebuffer.h"
 
