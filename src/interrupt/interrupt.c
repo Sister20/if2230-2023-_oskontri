@@ -46,7 +46,15 @@ void main_interrupt_handler(
     uint32_t int_number,
     __attribute__((unused)) struct InterruptStack info
 ) {
-    switch (int_number) {
 
+    switch (int_number) {
     }
+    keyboard_isr();
 }
+
+void activate_keyboard_interrupt(void) {
+    out(PIC1_DATA, PIC_DISABLE_ALL_MASK ^ (1 << IRQ_KEYBOARD));
+    out(PIC2_DATA, PIC_DISABLE_ALL_MASK);
+}
+
+

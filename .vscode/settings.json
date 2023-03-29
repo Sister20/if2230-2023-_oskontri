@@ -1,6 +1,8 @@
 {
     "files.associations": {
         "gdt.h": "c",
-        "stdtype.h": "c"
+        "stdtype.h": "c",
+        "framebuffer.h": "c",
+        "keyboard.h": "c"
     }
 }

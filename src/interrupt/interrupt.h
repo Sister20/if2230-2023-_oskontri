@@ -3,6 +3,7 @@
 
 #include "../lib-header/stdtype.h"
 #include "../lib-header/portio.h"
+#include "../keyboard/keyboard.h"
 
 /* -- PIC constants -- */
 
