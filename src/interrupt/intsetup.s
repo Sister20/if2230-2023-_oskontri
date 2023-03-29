@@ -1,6 +1,8 @@
 extern main_interrupt_handler
+global isr_stub_table
 
-; Generic handler section for interrupt
+
+;Generic handler section for interrupt
 call_generic_handler:
     ; Before interrupt_handler_n is called (caller of this generic handler section), 
     ; stack will have these value that pushed automatically by CPU

@@ -8,8 +8,10 @@
 
 static struct KeyboardDriverState keyboard_state = {
   .read_extended_mode = TRUE,
-  .keyboard_input_on = FALSE,
+  .keyboard_input_on = TRUE,
   .buffer_index = 0,
+  .row = 0,
+  .col = 0,
   .keyboard_buffer[0] = '\0'
 };
 
@@ -57,45 +59,51 @@ void keyboard_isr(void){
   if(!keyboard_state.keyboard_input_on){
     keyboard_state.buffer_index = 0;
   }
+
   else {
+    
     uint8_t  scancode    = in(KEYBOARD_DATA_PORT);
     char     mapped_char = keyboard_scancode_1_to_ascii_map[scancode];
+    // bool     lastpresskey = FALSE;
+    // uint8_t lastpresskey = 0;
     // TODO : Implement scancode processing
-    if(mapped_char == '\b') {
-      if(keyboard_state.buffer_index > 0) {
-        keyboard_state.buffer_index--;
-        keyboard_state.keyboard_buffer[keyboard_state.buffer_index] = '\0';
-        // fb_move_cursor(-1);
-        // fb_putc(' ');
-        // fb_move_cursor(-1);
-        framebuffer_set_cursor(1,0);
-        framebuffer_write(1,0,' ',0xF,0x000);
-        framebuffer_set_cursor(0,0);
-      }
-    }
-
-    else if(mapped_char == '\n') {
-      keyboard_state.keyboard_buffer[keyboard_state.buffer_index] = mapped_char;
-      keyboard_state.buffer_index++;
-      keyboard_state.keyboard_buffer[keyboard_state.buffer_index] = '\0';
-      // fb_putc('\n');
-      framebuffer_write(1,0,'\n',0xF,0x000);
-      keyboard_state.buffer_index = 0;
-    }
     
-    else if(mapped_char != 0) {
-      if(keyboard_state.buffer_index < KEYBOARD_BUFFER_SIZE-1) {
-        keyboard_state.keyboard_buffer[keyboard_state.buffer_index] = mapped_char;
-        keyboard_state.buffer_index++;
-        keyboard_state.keyboard_buffer[keyboard_state.buffer_index] = '\0';
-        // fb_putc(mapped_char);
-        framebuffer_write(0,keyboard_state.buffer_index,mapped_char,0xF,0);
-        framebuffer_set_cursor(0,keyboard_state.buffer_index);
-      }
-    }
-  }
-  pic_ack(IRQ_KEYBOARD);
-}
+              if (mapped_char == '\b'){
+                if (keyboard_state.col > 0){
+                  keyboard_state.col--;
+                  framebuffer_set_cursor(keyboard_state.row, keyboard_state.col);
+                  framebuffer_write(keyboard_state.row, keyboard_state.col, ' ', 0x0, 0x0);
+                }
+                else {
+
+                }
+              }
+              else if (mapped_char == '\n'){
+                keyboard_state.row++;
+                keyboard_state.col = 0;
+                framebuffer_set_cursor(keyboard_state.row, keyboard_state.col);
+
+              }
+              else if (mapped_char != 0){
+              framebuffer_write(keyboard_state.row,keyboard_state.col,mapped_char,0x0F,0x000);
+              keyboard_state.buffer_index++;
+              keyboard_state.col++;
+              if(keyboard_state.col == 81){
+                keyboard_state.col = 0;
+                keyboard_state.row++;
+              }
+          // fb_putc(mapped_char);
+              framebuffer_set_cursor(keyboard_state.row,keyboard_state.col);
+              }
+        }
+            pic_ack(IRQ_KEYBOARD);
+            // return;
+          }
+        
+      
+    // }
+//   }
+// }
 
 
 //=================================================================

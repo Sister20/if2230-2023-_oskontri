@@ -46,10 +46,12 @@ void main_interrupt_handler(
     uint32_t int_number,
     __attribute__((unused)) struct InterruptStack info
 ) {
-
     switch (int_number) {
+        case (PIC1_OFFSET + IRQ_KEYBOARD):
+            keyboard_isr();
+            // framebuffer_write(0,0,'a',0xF,0x000);
+            break;
     }
-    keyboard_isr();
 }
 
 void activate_keyboard_interrupt(void) {

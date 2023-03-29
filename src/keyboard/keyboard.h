@@ -35,6 +35,8 @@ struct KeyboardDriverState {
     bool    read_extended_mode;
     bool    keyboard_input_on;
     uint8_t buffer_index;
+    uint16_t row ;
+    uint16_t col;
     char    keyboard_buffer[KEYBOARD_BUFFER_SIZE];
 } __attribute((packed));
 
@@ -72,6 +74,5 @@ void keyboard_isr(void);
  * This can be made into blocking input with `while (is_keyboard_blocking());` 
  * after calling `keyboard_state_activate();`
  */
-void keyboard_isr(void);
 
 #endif

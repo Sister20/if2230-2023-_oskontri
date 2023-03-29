@@ -4,6 +4,7 @@
 #include "../lib-header/stdtype.h"
 #include "../lib-header/portio.h"
 #include "../keyboard/keyboard.h"
+#include "../lib-header/framebuffer.h"
 
 /* -- PIC constants -- */
 

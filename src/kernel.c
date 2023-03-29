@@ -12,25 +12,32 @@ void kernel_setup(void) {
     
     enter_protected_mode(&_gdt_gdtr);
     pic_remap();
-    activate_keyboard_interrupt();
+    // activate_keyboard_interrupt();
     initialize_idt();
     framebuffer_clear();
     framebuffer_set_cursor(0, 0);
-    while (TRUE) 
+    while (TRUE){
+      // int i = 1;
       keyboard_state_activate();
+      // framebuffer_write(i+4, i, ' ', 0X00, 0XF);
+      // i++;
+      // keyboard_isr();
 
+    }
 
 
 
     // enter_protected_mode(&_gdt_gdtr);
     // pic_remap();
+    // activate_keyboard_interrupt();
     // initialize_idt();
     // framebuffer_clear();
     // framebuffer_set_cursor(0, 0);
-    // __asm__("int $0x4");
+    // // __asm__("int $0x4");
     // while (TRUE);
-    // __asm__("int $0x4”);
-    // while (TRUE);
+    // keyboard_state_activate();
+    // // __asm__("int $0x4”);
+    // // while (TRUE);
 
 
     // enter_protected_mode(&_gdt_gdtr);

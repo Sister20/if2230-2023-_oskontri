@@ -18,7 +18,7 @@ struct IDT idt={
         }
     }
 };
-void *isr_stub_table[ISR_STUB_TABLE_LIMIT];
+// void *isr_stub_table[ISR_STUB_TABLE_LIMIT];
 
 // IDT table
 struct IDTR _idt_idtr ={
