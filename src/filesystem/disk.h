@@ -1,7 +1,7 @@
 #ifndef _DISK_H
 #define _DISK_H
 
-#include "stdtype.h"
+#include "../lib-header/stdtype.h"
 
 /* -- ATA PIO status codes -- */
 #define ATA_STATUS_BSY   0x80
@@ -48,5 +48,9 @@ void read_blocks(void *ptr, uint32_t logical_block_address, uint8_t block_count)
  * @param block_count           How many block to write, starting from block logical_block_address to lba-1
  */
 void write_blocks(const void *ptr, uint32_t logical_block_address, uint8_t block_count);
+
+void out16(uint16_t port, uint16_t data);
+
+uint16_t in16(uint16_t port);
 
 #endif
