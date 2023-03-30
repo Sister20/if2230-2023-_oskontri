@@ -16,18 +16,19 @@ const uint8_t fs_signature[BLOCK_SIZE] = {
 };
 
 void initialize_filesystem_fat32() {
-    // if (is_empty_storage()) {
+    if (is_empty_storage()) {
         // Initialize filesystem
         create_fat32();
-    // }
-    // else{
-    //    // Load filesystem 
-    // }
+    }
+    else{
+       // Load filesystem 
+         read_clusters(fat32DriveState.fat_table.cluster_map, 1, 1);
+    }
 }
 
 bool is_empty_storage() {
-    read_blocks(fat32DriveState.cluster_buf.buf, 0, 1);
-    return memcmp(fat32DriveState.cluster_buf.buf, fs_signature, BLOCK_SIZE) == 0;
+    read_clusters(fat32DriveState.cluster_buf.buf, 0, 1);
+    return memcmp(fat32DriveState.cluster_buf.buf, fs_signature, BLOCK_SIZE) != 0;
 }
 
 void init_directory_table(struct FAT32DirectoryTable *dir_table, char *name, uint32_t parent_dir_cluster){
@@ -76,9 +77,27 @@ uint32_t cluster_to_lba(uint32_t cluster) {
 }
 
 int8_t read_directory(struct FAT32DriverRequest request) {
-    read_clusters(request.buf ,request.parent_cluster_number, 1);
-    return 0;
+    for (int i = 0; i < 64; i++){
+        if (memcmp(fat32DriveState.dir_table_buf.table[i].name, request.name, 8) == 0 && memcmp(fat32DriveState.dir_table_buf.table[i].ext, request.ext, 3) == 0){
+            if (request.buffer_size < fat32DriveState.dir_table_buf.table[i].filesize) {
+                return 2;
+            }
+            else if (fat32DriveState.dir_table_buf.table[i].attribute == 1){
+                return 1;
+            }
+            else {
+                uint8_t loc = (fat32DriveState.dir_table_buf.table[i].cluster_high << 16) | fat32DriveState.dir_table_buf.table[i].cluster_low;
+                read_clusters(request.buf, loc, 1);
+                return 0;
+            }
+        }
+    }
+    return -1;
 }
+
+
+
+
 
 int8_t write(struct FAT32DriverRequest request) {
     uint32_t cluster_number = find_free_cluster();
@@ -86,6 +105,16 @@ int8_t write(struct FAT32DriverRequest request) {
     if (cluster_number == 0) {
         return -1;
     }
+    for (uint8_t i = 0; i < CLUSTER_SIZE / sizeof(struct FAT32DirectoryEntry) ; i++){
+        if (memcmp(fat32DriveState.dir_table_buf.table[i].name, request.name, 8) == 0){
+            if (fat32DriveState.dir_table_buf.table[i].filesize > 0){
+                return 2;
+            }
+            break;
+        }
+            
+        }
+    
     if (request.parent_cluster_number < 2) {
         return 2;
     }
@@ -170,10 +199,42 @@ int8_t write(struct FAT32DriverRequest request) {
     }
 
 
+
 int8_t read(struct FAT32DriverRequest request) {
-    read_clusters(request.buf, request.parent_cluster_number, 1);
-    return 0;
+    for (int i = 0; i < 64; i++){
+        if (memcmp(fat32DriveState.dir_table_buf.table[i].name, request.name, 8) == 0 && memcmp(fat32DriveState.dir_table_buf.table[i].ext, request.ext, 3) == 0){
+            if (request.buffer_size < fat32DriveState.dir_table_buf.table[i].filesize) {
+                return 2;
+            }
+
+            else if (fat32DriveState.dir_table_buf.table[i].attribute == 1){
+                return 1;
+            }
+            else {
+                uint8_t tot = fat32DriveState.dir_table_buf.table[i].filesize / CLUSTER_SIZE;
+                if (tot * CLUSTER_SIZE < fat32DriveState.dir_table_buf.table[i].filesize){
+                    tot += 1;
+                }
+                else {
+                    uint8_t file_location = (fat32DriveState.dir_table_buf.table[i].cluster_high << 16) | fat32DriveState.dir_table_buf.table[i].cluster_low;
+                    for (uint32_t j = 0; j < tot; j++){
+                        if (j == 0){
+                            read_clusters(request.buf + CLUSTER_SIZE * j, file_location, 1);
+                        }
+                        else {
+                            read_clusters(request.buf + CLUSTER_SIZE * j, fat32DriveState.fat_table.cluster_map[file_location], 1);
+                            file_location = fat32DriveState.fat_table.cluster_map[file_location];
+                        }
+                    }
+                    return 0;
+                }
+            }
+        }
+    }
+    return -1;
 }
+
+
 
 struct FAT32DirectoryEntry find_entry(uint32_t parent_cluster_number, char *name) {
     read_clusters(&fat32DriveState.dir_table_buf, parent_cluster_number, 1);
@@ -202,7 +263,6 @@ struct FAT32DirectoryEntry find_entry(uint32_t parent_cluster_number, char *name
 
 int8_t delete(struct FAT32DriverRequest request) {
     
-// get parent directory cluster number
     read_clusters(&fat32DriveState.dir_table_buf, request.parent_cluster_number, 1);
     for (uint8_t i = 0; i < CLUSTER_SIZE / sizeof(struct FAT32DirectoryEntry) ; i++) {
         if (memcmp(fat32DriveState.dir_table_buf.table[i].name, request.name, 8) == 0){
@@ -211,9 +271,7 @@ int8_t delete(struct FAT32DriverRequest request) {
             break;
         }
     }
-    return 0;
 
-// find the entry to be deleted in the directory table 
     struct FAT32DirectoryEntry entry = find_entry(request.parent_cluster_number, request.name);
     if (entry.user_attribute != UATTR_NOT_EMPTY) {
         return 1;
@@ -244,16 +302,10 @@ int8_t delete(struct FAT32DriverRequest request) {
                 break;
             }
         }
-        // set the entry to be deleted to empty
-        // write the directory table to the disk
-        // find the cluster number of the entry to be deleted
-        // read the fat table
         read_clusters(&fat32DriveState.fat_table, FAT_CLUSTER_NUMBER, 1);
-        // set the cluster number of the entry to be deleted to empty
         for (uint32_t i = bot; i < top; i++) {
             fat32DriveState.fat_table.cluster_map[i] = 0x00;
         }
-        // write the fat table to the disk
         write_clusters(&fat32DriveState.fat_table, FAT_CLUSTER_NUMBER, 1);
         return 0;
     }
