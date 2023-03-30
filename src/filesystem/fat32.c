@@ -5,6 +5,14 @@
 struct FAT32DriverState fat32DriveState;
 
 
+uint32_t get_first_cluster(const struct FAT32DirectoryEntry* entry) {
+    return ((uint32_t)entry->cluster_high << 16) | entry->cluster_low;
+}
+
+uint32_t max_read_cluster(uint32_t buffer_size) {
+    return buffer_size / CLUSTER_SIZE;
+}
+
 const uint8_t fs_signature[BLOCK_SIZE] = {
     'C', 'o', 'u', 'r', 's', 'e', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ',  ' ',
     'D', 'e', 's', 'i', 'g', 'n', 'e', 'd', ' ', 'b', 'y', ' ', ' ', ' ', ' ',  ' ',
@@ -98,12 +106,59 @@ int8_t write(struct FAT32DriverRequest request) {
     }
     write_clusters(&request, cluster_number, 1);
     return 0;
-    }
+}
 
 
 int8_t read(struct FAT32DriverRequest request) {
-    read_clusters(request.buf, request.parent_cluster_number, 1);
+    
+    struct FAT32DirectoryTable dir_table;
+    int8_t res = read_directory(request);
+    if (res != 0) {
+        return res;
+    }
+    if ((dir_table.table->attribute & ATTR_SUBDIRECTORY) == ATTR_SUBDIRECTORY) {
+        return 1; 
+    }
+
+    
+    uint32_t file_size = dir_table.table->filesize;
+    uint32_t cluster_count = (file_size + (CLUSTER_SIZE - 1)) / CLUSTER_SIZE;
+    if (cluster_count > request.buffer_size / CLUSTER_SIZE) {
+        return 2; 
+    }
+
+   
+    uint32_t cluster_number = dir_table.table->cluster_low;
+    uint32_t bytes_read = 0;
+    while (cluster_count > 0) {
+        uint32_t clusters_to_read = MIN(cluster_count, max_read_cluster(request.buffer_size));
+        read_clusters(request.buf + bytes_read, cluster_number, clusters_to_read);
+        bytes_read += clusters_to_read * CLUSTER_SIZE;
+        cluster_number = get_next_cluster(cluster_number);
+        cluster_count -= clusters_to_read;
+    }
+
+    return 0; 
+}
+
+
+
+uint32_t find_free_cluster() {
+    for (int i = 0; i < CLUSTER_SIZE; i++) {
+        if (fat32DriveState.fat_table.cluster_map[i] == 0x00) {
+            return i;
+        }
+    }
     return 0;
+}
+
+bool in_directory_table(struct FAT32DirectoryTable *dir_table, char *name) {
+    for (int i = 0; i < CLUSTER_MAP_SIZE; i++) {
+        if (memcmp(dir_table->table[i].name, name, 8) == 0) {
+            return TRUE;
+        }
+    }
+    return FALSE;
 }
 
 
