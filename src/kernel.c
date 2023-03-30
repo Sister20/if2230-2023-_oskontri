@@ -11,29 +11,48 @@
 
 void kernel_setup(void) {
     enter_protected_mode(&_gdt_gdtr);
-    pic_remap();
-    initialize_idt();
-    activate_keyboard_interrupt();
-    framebuffer_clear();
-    framebuffer_set_cursor(0, 0);
-    // initialize_filesystem_fat32();
-    create_fat32();
-    keyboard_state_activate();
+pic_remap();
+initialize_idt();
+activate_keyboard_interrupt();
+framebuffer_clear();
+framebuffer_set_cursor(0, 0);
+initialize_filesystem_fat32();
+keyboard_state_activate();
 
-    struct ClusterBuffer cbuf[5];
-    for (uint32_t i = 0; i < 5; i++)
-        for (uint32_t j = 0; j < CLUSTER_SIZE; j++)
-            cbuf[i].buf[j] = i + 'a';
+struct ClusterBuffer cbuf[5];
+for (uint32_t i = 0; i < 5; i++)
+for (uint32_t j = 0; j < CLUSTER_SIZE; j++)
+cbuf[i].buf[j] = i + 'a';
 
-    struct FAT32DriverRequest request = {
-        .buf                   = cbuf,
-        .name                  = "ikanaide",
-        .ext                   = "uwu",
-        .parent_cluster_number = ROOT_CLUSTER_NUMBER,
-        .buffer_size           = 0,
-    } ;
+struct FAT32DriverRequest request = {
+.buf = cbuf,
+.name = "ikanaide",
+.ext = "uwu",
+.parent_cluster_number = ROOT_CLUSTER_NUMBER,
+.buffer_size = 0,
+};
 
-    write(request);  // Create folder "ikanaide"
+write(request);
+
+struct FAT32DriverRequest request2 = {
+.buf = cbuf,
+.name = "kanol",
+.ext = "txt",
+.parent_cluster_number = ROOT_CLUSTER_NUMBER,
+.buffer_size = 25,
+};
+
+write(request2);
+
+struct FAT32DriverRequest request3 = {
+.buf = cbuf,
+.name = "ikanemas",
+.ext = "exe",
+.parent_cluster_number = ROOT_CLUSTER_NUMBER,
+.buffer_size = 0,
+};
+
+write(request3); // Create folder "ikanaide"
 
 
 
