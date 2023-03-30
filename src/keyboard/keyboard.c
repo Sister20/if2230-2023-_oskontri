@@ -11,7 +11,7 @@ static struct KeyboardDriverState keyboard_state = {
   .keyboard_input_on = TRUE,
   .buffer_index = 0,
   .row = 0,
-  .col = 0,
+  .col[0] = 0,
   .keyboard_buffer[0] = '\0'
 };
 
@@ -69,31 +69,35 @@ void keyboard_isr(void){
     // TODO : Implement scancode processing
     
               if (mapped_char == '\b'){
-                if (keyboard_state.col > 0){
-                  keyboard_state.col--;
-                  framebuffer_set_cursor(keyboard_state.row, keyboard_state.col);
-                  framebuffer_write(keyboard_state.row, keyboard_state.col, ' ', 0x0, 0x0);
+                if (keyboard_state.col[keyboard_state.row] > 0){
+                  keyboard_state.col[keyboard_state.row]--;
+                  framebuffer_set_cursor(keyboard_state.row, keyboard_state.col[keyboard_state.row]);
+                  framebuffer_write(keyboard_state.row, keyboard_state.col[keyboard_state.row], ' ', 0x0, 0x0);
                 }
                 else {
-
+                  if (keyboard_state.row > 0){
+                    keyboard_state.row--;
+                    framebuffer_set_cursor(keyboard_state.row, keyboard_state.col[keyboard_state.row]);
+                    framebuffer_write(keyboard_state.row, keyboard_state.col[keyboard_state.row], ' ', 0x0, 0x0);
+                  }
                 }
               }
               else if (mapped_char == '\n'){
                 keyboard_state.row++;
-                keyboard_state.col = 0;
-                framebuffer_set_cursor(keyboard_state.row, keyboard_state.col);
+                keyboard_state.col[keyboard_state.row] = 0;
+                framebuffer_set_cursor(keyboard_state.row, keyboard_state.col[keyboard_state.row]);
 
               }
               else if (mapped_char != 0){
-              framebuffer_write(keyboard_state.row,keyboard_state.col,mapped_char,0x0F,0x000);
+              framebuffer_write(keyboard_state.row,keyboard_state.col[keyboard_state.row],mapped_char,0x0F,0x000);
               keyboard_state.buffer_index++;
-              keyboard_state.col++;
-              if(keyboard_state.col == 81){
-                keyboard_state.col = 0;
+              keyboard_state.col[keyboard_state.row]++;
+              if(keyboard_state.col[keyboard_state.row] == 81){
+                keyboard_state.col[keyboard_state.row] = 0;
                 keyboard_state.row++;
               }
           // fb_putc(mapped_char);
-              framebuffer_set_cursor(keyboard_state.row,keyboard_state.col);
+              framebuffer_set_cursor(keyboard_state.row,keyboard_state.col[keyboard_state.row]);
               }
         }
             pic_ack(IRQ_KEYBOARD);

@@ -25,7 +25,7 @@
 #define CLUSTER_1_VALUE       0x0FFFFFFF
 
 // EOF also double as valid cluster / "this is last valid cluster in the chain"
-#define FAT32_FAT_END_OF_FILE 0x0FFFFFFF
+#define FAT32_FAT_END_OF_FILE 0x0FFFFFFF 
 #define FAT32_FAT_EMPTY_ENTRY 0x00000000
 
 #define FAT_CLUSTER_NUMBER    1
@@ -245,5 +245,9 @@ int8_t write(struct FAT32DriverRequest request);
  * @return Error code: 0 success - 1 not found - 2 folder is not empty - -1 unknown
  */
 int8_t delete(struct FAT32DriverRequest request);
+
+uint32_t find_free_cluster(void);
+
+bool in_directory_table(struct FAT32DirectoryTable *dir_table, char *name);
 
 #endif

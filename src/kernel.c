@@ -7,23 +7,34 @@
 #include "lib-header/kernel_loader.h"
 #include "interrupt/interrupt.h"
 #include "keyboard/keyboard.h"
+#include "filesystem/fat32.h"
 
 void kernel_setup(void) {
-    
     enter_protected_mode(&_gdt_gdtr);
     pic_remap();
-    // activate_keyboard_interrupt();
     initialize_idt();
+    activate_keyboard_interrupt();
     framebuffer_clear();
     framebuffer_set_cursor(0, 0);
-    while (TRUE){
-      // int i = 1;
-      keyboard_state_activate();
-      // framebuffer_write(i+4, i, ' ', 0X00, 0XF);
-      // i++;
-      // keyboard_isr();
+    // initialize_filesystem_fat32();
+    create_fat32();
+    keyboard_state_activate();
 
-    }
+    struct ClusterBuffer cbuf[5];
+    for (uint32_t i = 0; i < 5; i++)
+        for (uint32_t j = 0; j < CLUSTER_SIZE; j++)
+            cbuf[i].buf[j] = i + 'a';
+
+    struct FAT32DriverRequest request = {
+        .buf                   = cbuf,
+        .name                  = "ikanaide",
+        .ext                   = "uwu",
+        .parent_cluster_number = ROOT_CLUSTER_NUMBER,
+        .buffer_size           = 0,
+    } ;
+
+    write(request);  // Create folder "ikanaide"
+
 
 
 
