@@ -7,7 +7,7 @@
 
 
 static struct KeyboardDriverState keyboard_state = {
-  .read_extended_mode = TRUE,
+  .read_extended_mode = FALSE,
   .keyboard_input_on = TRUE,
   .buffer_index = 0,
   .row = 0,

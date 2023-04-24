@@ -2,7 +2,7 @@
 #define _FRAMEBUFFER_H
 
 
-#define MEMORY_FRAMEBUFFER (uint8_t *) 0xB8000
+#define MEMORY_FRAMEBUFFER (uint8_t *) 0xC00B8000
 #define CURSOR_PORT_CMD    0x03D4
 #define CURSOR_PORT_DATA   0x03D5
 
