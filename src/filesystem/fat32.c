@@ -129,6 +129,7 @@ int8_t write(struct FAT32DriverRequest request) {
         if (found){
             return 1;
         }
+        
         struct FAT32DirectoryEntry entry={
             .name = {0},
             .ext = {0},
@@ -144,12 +145,23 @@ int8_t write(struct FAT32DriverRequest request) {
             .cluster_low = 0,
             .filesize = 0,
         };
+        if (request.buffer_size == 0){
                 memcpy(entry.name, request.name, 8);
                 entry.attribute = ATTR_SUBDIRECTORY;
                 entry.user_attribute = UATTR_NOT_EMPTY;
                 entry.cluster_low = (uint16_t)(request.parent_cluster_number >> 16);
                 entry.cluster_high = (uint16_t)(request.parent_cluster_number & 0xFFFF);
                 entry.filesize = request.buffer_size;
+        }
+        else {
+                memcpy(entry.name, request.name, 8);
+                memcpy(entry.ext, request.ext, 3);
+                entry.attribute = ATTR_SUBDIRECTORY;
+                entry.user_attribute = UATTR_NOT_EMPTY;
+                entry.cluster_low = (uint16_t)(request.parent_cluster_number >> 16);
+                entry.cluster_high = (uint16_t)(request.parent_cluster_number & 0xFFFF);
+                entry.filesize = request.buffer_size;
+        }
         for (uint8_t i = 0; i < CLUSTER_SIZE / sizeof(struct FAT32DirectoryEntry) ; i++) {
             if (fat32DriveState.dir_table_buf.table[i].user_attribute != UATTR_NOT_EMPTY){
                 fat32DriveState.dir_table_buf.table[i] = entry;
@@ -180,10 +192,11 @@ int8_t write(struct FAT32DriverRequest request) {
 
         }
         if (request.buffer_size == 0){
+            struct FAT32DirectoryTable temp = {0};
             memset(&fat32DriveState.dir_table_buf, 0, sizeof(fat32DriveState.dir_table_buf.table));
             read_clusters(&fat32DriveState.dir_table_buf, request.parent_cluster_number, 1);
-            init_directory_table(&fat32DriveState.dir_table_buf, request.name, request.parent_cluster_number);
-            write_clusters(&fat32DriveState.dir_table_buf, cluster_number, 1);
+            init_directory_table(&temp, request.name, cluster_number);
+            write_clusters(&temp, cluster_number, 1);
         }
         else{
             
@@ -196,7 +209,7 @@ int8_t write(struct FAT32DriverRequest request) {
         
     }
     return 0;
-    }
+}
 
 
 
