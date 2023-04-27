@@ -27,30 +27,3 @@ void framebuffer_clear(void) {
         }
     }
 }
-
-void puts(char *str, uint32_t fg, uint32_t bg) {
-    uint8_t current_row = 0, current_col = 0;
-    while (*str) {
-        if (*str == '\n') {
-            current_row++;
-            current_col = 0;
-            str++;
-        } else {
-            framebuffer_write(current_row, current_col, *str++, (uint8_t) fg, (uint8_t) bg);
-            current_col++;
-        }
-        if (current_col == 79) {
-            current_row++;
-            current_col = 0;
-        }
-        if (current_row == 24) {
-            if (current_col < 79) {
-                current_col++;
-            } else {
-                current_row = 0;
-                current_col = 0;
-            }
-        }
-        framebuffer_set_cursor(current_row, current_col);
-    }
-}

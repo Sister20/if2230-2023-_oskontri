@@ -4,6 +4,8 @@
         "stdtype.h": "c",
         "framebuffer.h": "c",
         "keyboard.h": "c",
-        "interrupt.h": "c"
+        "interrupt.h": "c",
+        "portio.h": "c",
+        "idt.h": "c"
     }
 }
