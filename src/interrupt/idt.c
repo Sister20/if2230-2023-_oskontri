@@ -51,7 +51,12 @@ struct IDTR _idt_idtr ={
    */
     // Set IDTR descriptor
     for (int i = 0; i < ISR_STUB_TABLE_LIMIT; i++) {
-        set_interrupt_gate(i, isr_stub_table[i], GDT_KERNEL_CODE_SEGMENT_SELECTOR, 0);
+        if(i >= 0x30 && i <= 0x3F) {
+            set_interrupt_gate(i, isr_stub_table[i], GDT_KERNEL_CODE_SEGMENT_SELECTOR, 0x3);
+        }
+        else{
+            set_interrupt_gate(i, isr_stub_table[i], GDT_KERNEL_CODE_SEGMENT_SELECTOR, 0);
+        }
     }
 
     // Set IDTR descriptor
@@ -59,6 +64,7 @@ struct IDTR _idt_idtr ={
     __asm__ volatile("lidt %0" : : "m"(_idt_idtr));
     __asm__ volatile("sti");
 }
+
 void set_interrupt_gate(uint8_t int_vector, void *handler_address, uint16_t gdt_seg_selector, uint8_t privilege) {
     struct IDTGate *idt_int_gate = &idt.table[int_vector];
     // TODO : Set handler offset, privilege & segment
