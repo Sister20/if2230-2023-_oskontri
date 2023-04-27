@@ -1,6 +1,7 @@
 #ifndef _INTERRUPT_H
 #define _INTERRUPT_H
 
+#include <string.h>
 #include "../lib-header/stdtype.h"
 #include "../lib-header/portio.h"
 #include "../keyboard/keyboard.h"
@@ -126,6 +127,8 @@ void pic_remap(void);
  */
 void main_interrupt_handler(struct CPURegister cpu, uint32_t int_number, struct InterruptStack info);
 
+<<<<<<< Updated upstream
+=======
 
 extern struct TSSEntry _interrupt_tss_entry;
 
@@ -142,4 +145,7 @@ struct TSSEntry {
 
 // Set kernel stack in TSS
 void set_tss_kernel_current_stack(void);
+
+
+>>>>>>> Stashed changes
 #endif

@@ -41,4 +41,6 @@ void framebuffer_set_cursor(uint8_t r, uint8_t c);
  */
 void framebuffer_clear(void);
 
+// void puts(char* str, uint8_t fg, uint8_t bg) ;
+
 #endif
