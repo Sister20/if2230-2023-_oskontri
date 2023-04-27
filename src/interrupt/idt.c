@@ -39,7 +39,7 @@ struct IDTR _idt_idtr ={
  * @param gdt_seg_selector GDT segment selector, for kernel use GDT_KERNEL_CODE_SEGMENT_SELECTOR
  * @param privilege        Descriptor privilege level
  */
-    void initialize_idt(void) {
+void initialize_idt(void) {
     /* TODO : 
    * Iterate all isr_stub_table,
    * Set all IDT entry with set_interrupt_gate()
@@ -49,16 +49,21 @@ struct IDTR _idt_idtr ={
    * Segment: GDT_KERNEL_CODE_SEGMENT_SELECTOR
    * Privilege: 0
    */
-    // Set IDTR descriptor
+    // Set IDT entries with privilege level 0
     for (int i = 0; i < ISR_STUB_TABLE_LIMIT; i++) {
         set_interrupt_gate(i, isr_stub_table[i], GDT_KERNEL_CODE_SEGMENT_SELECTOR, 0);
     }
 
-    // Set IDTR descriptor
-    
+    // Set IDT entries with privilege level 0x3
+    for (int i = 0x30; i <= 0x3F; i++) {
+        set_interrupt_gate(i, isr_stub_table[i], GDT_KERNEL_CODE_SEGMENT_SELECTOR, 0x3);
+    }
+
+    // Load IDTR descriptor and enable interrupts
     __asm__ volatile("lidt %0" : : "m"(_idt_idtr));
     __asm__ volatile("sti");
 }
+
 void set_interrupt_gate(uint8_t int_vector, void *handler_address, uint16_t gdt_seg_selector, uint8_t privilege) {
     struct IDTGate *idt_int_gate = &idt.table[int_vector];
     // TODO : Set handler offset, privilege & segment

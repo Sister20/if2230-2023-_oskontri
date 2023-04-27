@@ -1,5 +1,11 @@
 #include "interrupt.h"
 
+
+struct TSSEntry _interrupt_tss_entry = {
+    .ss0  = GDT_KERNEL_DATA_SEGMENT_SELECTOR,
+};
+
+
 void io_wait(void) {
     out(0x80, 0);
 }
@@ -41,15 +47,30 @@ void pic_remap(void) {
     out(PIC2_DATA, a2);
 }
 
-void main_interrupt_handler(
-    __attribute__((unused)) struct CPURegister cpu,
-    uint32_t int_number,
-    __attribute__((unused)) struct InterruptStack info
-) {
+// void main_interrupt_handler(
+//     __attribute__((unused)) struct CPURegister cpu,
+//     uint32_t int_number,
+//     __attribute__((unused)) struct InterruptStack info
+// ) {
+//     switch (int_number) {
+//         case (PIC1_OFFSET + IRQ_KEYBOARD + 1):
+//             keyboard_isr();
+//             // framebuffer_write(0,0,'a',0xF,0x000);
+//             break;
+//     }
+// }
+
+void main_interrupt_handler(struct CPURegister cpu, uint32_t int_number, struct InterruptStack info) {
     switch (int_number) {
+<<<<<<< Updated upstream
         case (PIC1_OFFSET + IRQ_KEYBOARD):
+=======
+        case PIC1_OFFSET + IRQ_KEYBOARD:
+>>>>>>> Stashed changes
             keyboard_isr();
-            // framebuffer_write(0,0,'a',0xF,0x000);
+            break;
+        case 0x30:
+            syscall(cpu, info);
             break;
     }
 }
@@ -58,5 +79,26 @@ void activate_keyboard_interrupt(void) {
     out(PIC1_DATA, PIC_DISABLE_ALL_MASK ^ (1 << IRQ_KEYBOARD));
     out(PIC2_DATA, PIC_DISABLE_ALL_MASK);
 }
+
+
+void syscall(struct CPURegister cpu, __attribute__((unused)) struct InterruptStack info) {
+    if (cpu.eax == 0) {
+        struct FAT32DriverRequest request = *(struct FAT32DriverRequest*) cpu.ebx;
+        *((int8_t*) cpu.ecx) = read(request);
+    } else if (cpu.eax == 4) {
+        keyboard_state_activate();
+        __asm__("sti"); // Due IRQ is disabled when main_interrupt_handler() called
+        while (is_keyboard_blocking());
+        char buf[KEYBOARD_BUFFER_SIZE];
+        get_keyboard_buffer(buf);
+        memcpy((char *) cpu.ebx, buf, cpu.ecx);
+    } else if (cpu.eax == 5) {
+        puts((char *) cpu.ebx, cpu.ecx, cpu.edx); // Modified puts() on kernel side
+    }
+}
+
+
+
+
 
 
