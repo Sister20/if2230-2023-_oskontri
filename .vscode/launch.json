@@ -23,18 +23,22 @@
             "postDebugTask": "Exit QEMU",
             "targetArchitecture": "x86",
             "customLaunchSetupCommands": [
-                {
-                    "text": "target remote localhost:1234",
-                    "description": "Connect to QEMU remote debugger"
-                },
-                {
-                    "text": "symbol-file kernel",
-                    "description": "Get kernel symbols"
-                },
-                {
-                    "text": "set output-radix 16",
-                    "description": "Use hexadecimal output"
-                }
+            {
+                "text": "target remote localhost:1234",
+                "description": "Connect to QEMU remote debugger"
+            },
+            {
+                "text": "symbol-file kernel",
+                "description": "Get kernel symbols"
+            },
+            {
+                "text": "add-symbol-file shell_elf",
+                "description": "Get shell symbols"
+            },
+            {
+                "text": "set output-radix 16",
+                "description": "Use hexadecimal output"
+            }
             ],
             "avoidWindowsConsoleRedirection": true
         },
