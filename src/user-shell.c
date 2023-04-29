@@ -43,51 +43,29 @@ void syscall(uint32_t eax, uint32_t ebx, uint32_t ecx, uint32_t edx) {
 void puts(char *buf, uint32_t len, uint32_t color) {
     syscall(5, (uint32_t) buf, len, color);
 }
-// void command (uint32_t buf){
-//     // int32_t retcode;
+void command (uint32_t buf){
+    int32_t retcode;
     
-//     if(memcmp((char *)buf, "cd" , 2)){
-        
-//     }
-//     else if(memcmp((char *)buf, "ls" , 2)){
-        
-//     }
 
-//     else if (memcmp((char *) buf, "mkdir", 5)){
-//         // const char *name = (const char *)(buf + 6);
-//         // struct  FAT32DriverRequest request = {
-//         // .parent_cluster_number = ROOT_CLUSTER_NUMBER,
-//         // .buffer_size = 0,
-//         // };
-//         // memcpy(request.name, name, sizeof(request.name) - 1);
-//         // syscall(2, (uint32_t)&request, (uint32_t)&retcode, 0);
-//         // if (retcode == 0){
-//         //     puts("Create Directory success", 23, 0x2);
-//         // }
-//         // else {
-//         //     puts("Create Directory failed", 22, 0x4);
-//         // }
-//     }
+    if (memcmp((char *) buf, "mkdir", 5)){
+        const char *name = (const char *)(buf + 6);
+        struct  FAT32DriverRequest request = {
+        .parent_cluster_number = ROOT_CLUSTER_NUMBER,
+        .buffer_size = 0,
+        };
+        memcpy(request.name, name, sizeof(request.name) - 1);
+        syscall(1, (uint32_t)&request, (uint32_t)&retcode, 0);
+        // if (retcode == 0){
+        //     puts("Create Directory success", 23, 0x2);
+        // }
+        // else {
+        //     puts("Create Directory failed", 22, 0x4);
+        // }
+    }
 
-//     // else if(memcmp((char *)buf, "cat" , 3)){
-//     //     const char *name = (const char *)(buf + 4)
-//     // }
+    
 
-//     // else if(memcmp((char *)buf, "cp" , 2)){
-        
-//     // }
-
-//     // else if(memcmp((char *)buf, "rm" , 2)){
-        
-//     // }
-//     // else if(memcmp((char *)buf, "mv" , 2)){
-        
-//     // }
-//     // else if(memcmp((char *)buf, "whereis" ,7)){
-        
-//     // }
-
-// }
+}
 
 int main(void) {
     struct ClusterBuffer cl           = {0};
@@ -108,8 +86,6 @@ int main(void) {
         puts("oskontri@OS", 11, 0xA);
         syscall(4, (uint32_t) buf, 16, 0);
         // command((uint32_t)buf);
-        // int32_t retcode;
-        // syscall(5, (uint32_t) buf, 16, 0xF);
     }
 
     return 0;

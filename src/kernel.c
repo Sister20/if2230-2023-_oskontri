@@ -144,7 +144,7 @@ void kernel_setup(void) {
     initialize_idt();
     activate_keyboard_interrupt();
     framebuffer_clear();
-    framebuffer_set_cursor(0, 0);
+    framebuffer_set_cursor(0, 6);
     initialize_filesystem_fat32();
     gdt_install_tss();
     set_tss_register();
