@@ -93,7 +93,7 @@ void keyboard_isr(void){
               keyboard_state.buffer_index++;
               keyboard_state.col[keyboard_state.row]++;
               if(keyboard_state.col[keyboard_state.row] == 81){
-                keyboard_state.col[keyboard_state.row] = 0;
+
                 keyboard_state.row++;
               }
           // fb_putc(mapped_char);

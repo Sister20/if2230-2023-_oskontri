@@ -247,6 +247,7 @@ int8_t write(struct FAT32DriverRequest request);
 int8_t delete(struct FAT32DriverRequest request);
 
 uint32_t find_free_cluster(void);
+uint32_t next_free_cluster(uint32_t cluster_number);
 
 bool in_directory_table(struct FAT32DirectoryTable *dir_table, char *name);
 

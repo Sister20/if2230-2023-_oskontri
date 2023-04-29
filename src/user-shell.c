@@ -30,7 +30,7 @@ int main(void) {
     int32_t retcode;
     syscall(0, (uint32_t) &request, (uint32_t) &retcode, 0);
     if (retcode == 0)
-        syscall(5, (uint32_t) "owo\n", 4, 0xF);
+        syscall(5, (uint32_t) "owo", 4, 0xF);
 
     char buf[16];
     while (TRUE) {

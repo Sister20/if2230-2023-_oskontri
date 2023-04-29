@@ -56,7 +56,7 @@ void pic_remap(void) {
 
 void main_interrupt_handler(struct CPURegister cpu, uint32_t int_number, struct InterruptStack info) {
     switch (int_number) {
-        case PIC1_OFFSET + IRQ_KEYBOARD:
+        case PIC1_OFFSET + IRQ_KEYBOARD+1:
             keyboard_isr();
             break;
         case 0x30:
@@ -83,15 +83,15 @@ void syscall(struct CPURegister cpu, __attribute__((unused)) struct InterruptSta
     }
 }
 
-void puts(char *str, uint32_t fg, uint32_t bg) {
+void puts(char *str, uint32_t len, uint32_t fg) {
     uint8_t current_row = 0, current_col = 0;
-    while (*str) {
+    for (uint32_t i = 0; i < len; i++) {
         if (*str == '\n') {
             current_row++;
             current_col = 0;
             str++;
         } else {
-            framebuffer_write(current_row, current_col, *str++, (uint8_t) fg, (uint8_t) bg);
+            framebuffer_write(current_row, current_col, str[i], (uint8_t) fg, (uint8_t) 0x00);
             current_col++;
         }
         if (current_col == 79) {
