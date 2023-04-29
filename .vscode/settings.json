@@ -6,6 +6,7 @@
         "keyboard.h": "c",
         "interrupt.h": "c",
         "portio.h": "c",
-        "idt.h": "c"
+        "idt.h": "c",
+        "string": "c"
     }
 }

@@ -87,7 +87,6 @@ void keyboard_isr(void){
                 keyboard_state.col[keyboard_state.row] = 0;
                 framebuffer_set_cursor(keyboard_state.row, keyboard_state.col[keyboard_state.row]);
                 keyboard_state_deactivate();
-
               }
               else if (mapped_char != 0){
               framebuffer_write(keyboard_state.row,keyboard_state.col[keyboard_state.row],mapped_char,0x0F,0x000);

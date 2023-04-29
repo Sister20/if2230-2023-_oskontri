@@ -1,5 +1,11 @@
 #include "interrupt.h"
 
+struct putsCursor {
+    uint32_t row;
+};
+
+struct putsCursor cursor = {0};
+
 void io_wait(void) {
     out(0x80, 0);
 }
@@ -86,33 +92,13 @@ void syscall(struct CPURegister cpu, __attribute__((unused)) struct InterruptSta
     } 
     else if (cpu.eax == 5) {
         puts((char *) cpu.ebx, cpu.ecx, cpu.edx); // Modified puts() on kernel side
+        cursor.row++;
     }
 }
 
 void puts(char *str, uint32_t len, uint32_t fg) {
-    uint8_t current_row = 0, current_col = 0;
-    for (uint32_t i = 0; i < len; i++) {
-        if (*str == '\n') {
-            current_row++;
-            current_col = 0;
-            str++;
-        } else {
-            framebuffer_write(current_row, current_col, str[i], (uint8_t) fg, (uint8_t) 0x00);
-            current_col++;
-        }
-        if (current_col == 79) {
-            current_row++;
-            current_col = 0;
-        }
-        // if (current_row == 24) {
-        //     if (current_col < 79) {
-        //         current_col++;
-        //     } else {
-        //         current_row = 0;
-        //         current_col = 0;
-        //     }
-        // }
-        framebuffer_set_cursor(current_row, current_col);
+    for (uint32_t i = 0; i < len; i++) {    
+        framebuffer_write(cursor.row, i, str[i], (uint8_t) fg, (uint8_t) 0x00);
     }
 }
 
