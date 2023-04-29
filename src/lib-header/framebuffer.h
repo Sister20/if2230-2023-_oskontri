@@ -2,7 +2,7 @@
 #define _FRAMEBUFFER_H
 
 
-#define MEMORY_FRAMEBUFFER (uint8_t *) 0xB8000
+#define MEMORY_FRAMEBUFFER (uint8_t *) 0xC00B8000
 #define CURSOR_PORT_CMD    0x03D4
 #define CURSOR_PORT_DATA   0x03D5
 
@@ -40,5 +40,7 @@ void framebuffer_set_cursor(uint8_t r, uint8_t c);
  * 
  */
 void framebuffer_clear(void);
+
+// void puts(char* str, uint8_t fg, uint8_t bg) ;
 
 #endif

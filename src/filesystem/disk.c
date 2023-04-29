@@ -1,6 +1,6 @@
 #include "disk.h"
 #include "../lib-header/portio.h"
-
+//a
 static void ATA_busy_wait() {
     while (in(0x1F7) & ATA_STATUS_BSY);
 }
