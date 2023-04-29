@@ -19,14 +19,14 @@ extern struct PageDirectory _paging_kernel_page_directory;
  * ...
  */
 struct PageDirectoryEntryFlag {
-    uint8_t present_bit        : 1;
-    uint8_t read_write_bit     : 1;
-    uint8_t user_supervisor_bit: 1;
-    uint8_t write_through_bit  : 1;
-    uint8_t cache_disable_bit  : 1;
-    uint8_t accessed_bit       : 1;
-    uint8_t dirty_bit          : 1;
-    uint8_t page_size_bit      : 1; 
+    uint8_t present_bit : 1;
+    uint8_t write_bit : 1;
+    uint8_t user_supervisor : 1;
+    uint8_t write_through : 1;
+    uint8_t cache_disable : 1;
+    uint8_t accessed : 1;
+    uint8_t dirty : 1;
+    uint8_t use_pagesize_4_mb : 1;
 } __attribute__((packed));
 
 /**
