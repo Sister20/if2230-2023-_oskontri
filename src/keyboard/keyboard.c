@@ -54,10 +54,10 @@ bool is_keyboard_blocking(void){
   return keyboard_state.keyboard_input_on;
 }
 
-void keyboard_isr(void){
-  
+void keyboard_isr(uint32_t len){
+  framebuffer_write(20,20, 'a' + len, 0x0, 0xFF);
   if(!keyboard_state.keyboard_input_on){
-    keyboard_state.buffer_index = 0;
+    keyboard_state.buffer_index = len;
   }
 
   else {
@@ -71,33 +71,33 @@ void keyboard_isr(void){
               if (mapped_char == '\b'){
                 if (keyboard_state.col[keyboard_state.row] > 0){
                   keyboard_state.col[keyboard_state.row]--;
-                  framebuffer_set_cursor(keyboard_state.row, keyboard_state.col[keyboard_state.row]);
-                  framebuffer_write(keyboard_state.row, keyboard_state.col[keyboard_state.row], ' ', 0x0, 0x0);
+                  framebuffer_set_cursor(keyboard_state.row, keyboard_state.col[keyboard_state.row] + len);
+                  framebuffer_write(keyboard_state.row, keyboard_state.col[keyboard_state.row] + len, ' ', 0x0, 0x0);
                 }
                 else {
                   if (keyboard_state.row > 0){
                     keyboard_state.row--;
-                    framebuffer_set_cursor(keyboard_state.row, keyboard_state.col[keyboard_state.row]);
-                    framebuffer_write(keyboard_state.row, keyboard_state.col[keyboard_state.row], ' ', 0x0, 0x0);
+                    framebuffer_set_cursor(keyboard_state.row, keyboard_state.col[keyboard_state.row] + len);
+                    framebuffer_write(keyboard_state.row, keyboard_state.col[keyboard_state.row] + len, ' ', 0x0, 0x0);
                   }
                 }
               }
               else if (mapped_char == '\n'){
                 keyboard_state.row++;
                 keyboard_state.col[keyboard_state.row] = 0;
-                framebuffer_set_cursor(keyboard_state.row, keyboard_state.col[keyboard_state.row]);
+                framebuffer_set_cursor(keyboard_state.row, keyboard_state.col[keyboard_state.row] + len);
                 keyboard_state_deactivate();
               }
               else if (mapped_char != 0){
-              framebuffer_write(keyboard_state.row,keyboard_state.col[keyboard_state.row],mapped_char,0x0F,0x000);
-              keyboard_state.buffer_index++;
-              keyboard_state.col[keyboard_state.row]++;
-              if(keyboard_state.col[keyboard_state.row] == 81){
+                framebuffer_write(keyboard_state.row,keyboard_state.col[keyboard_state.row] + len,mapped_char,0x0F,0x000);
+                keyboard_state.buffer_index++;
+                keyboard_state.col[keyboard_state.row]++;
+                if(keyboard_state.col[keyboard_state.row] == 81){
 
-                keyboard_state.row++;
-              }
-          // fb_putc(mapped_char);
-              framebuffer_set_cursor(keyboard_state.row,keyboard_state.col[keyboard_state.row]);
+                  keyboard_state.row++;
+                }
+            // fb_putc(mapped_char);
+                framebuffer_set_cursor(keyboard_state.row,keyboard_state.col[keyboard_state.row] + len);
               }
         }
             pic_ack(IRQ_KEYBOARD);

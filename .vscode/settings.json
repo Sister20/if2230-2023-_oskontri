@@ -7,6 +7,9 @@
         "interrupt.h": "c",
         "portio.h": "c",
         "idt.h": "c",
-        "string": "c"
+        "string": "c",
+        "disk.h": "c",
+        "fat32.h": "c",
+        "cstdio": "c"
     }
 }

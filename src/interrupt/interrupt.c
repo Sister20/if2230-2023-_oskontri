@@ -2,6 +2,7 @@
 
 struct putsCursor {
     uint32_t row;
+    uint32_t col;
 };
 
 struct putsCursor cursor = {0};
@@ -66,9 +67,10 @@ void main_interrupt_handler(struct CPURegister cpu, uint32_t int_number, struct 
             __asm__("hlt");
             break;
         case PIC1_OFFSET + IRQ_KEYBOARD:
-            keyboard_isr();
+            keyboard_isr(cursor.col);
             break;
         case 0x30:
+            cursor.col = cpu.ecx;
             syscall(cpu, info);
             break;
         default:
@@ -97,9 +99,18 @@ void syscall(struct CPURegister cpu, __attribute__((unused)) struct InterruptSta
 }
 
 void puts(char *str, uint32_t len, uint32_t fg) {
-    for (uint32_t i = 0; i < len; i++) {    
+    for (uint32_t i = 0; i < len; i++) {
+        // if(cursor.row > 0){
+        //     framebuffer_write(cursor.row/2+1, i, str[i], (uint8_t) fg, (uint8_t) 0x00);
+        //     framebuffer_write(cursor.row/2+1, len, cursor.row + '0', (uint8_t) fg, (uint8_t) 0x00);
+        // }
+        // else{
+        //     framebuffer_write(0, i, str[i], (uint8_t) fg, (uint8_t) 0x00);
+        //     framebuffer_write(0, len, cursor.row + '0', (uint8_t) fg, (uint8_t) 0x00);
+        // } 
         framebuffer_write(cursor.row, i, str[i], (uint8_t) fg, (uint8_t) 0x00);
     }
+        // framebuffer_write(15,15, len + 'a', (uint8_t) fg, (uint8_t) 0x00);
 }
 
 
