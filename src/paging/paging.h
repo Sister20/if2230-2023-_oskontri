@@ -45,9 +45,9 @@ struct PageDirectoryEntry {
     uint16_t global_page : 1;
     uint16_t ignored : 3;
     uint16_t pat : 1;
-    uint16_t bits : 4;
-    uint16_t lower_address : 5;
-    uint16_t higher_address : 10;
+    uint16_t higher_address : 8;
+    uint16_t reserved : 1;
+    uint16_t lower_address : 10;
 } __attribute__((packed));
 
 /**
@@ -61,7 +61,7 @@ struct PageDirectoryEntry {
  */
 struct PageDirectory {
     struct PageDirectoryEntry table[PAGE_ENTRY_COUNT]  ;
-} __attribute__((packed));
+} __attribute__((aligned(0x1000)));
 
 /**
  * Containing page driver states

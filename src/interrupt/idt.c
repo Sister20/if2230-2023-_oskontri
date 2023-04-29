@@ -23,7 +23,7 @@ struct IDT idt={
 // IDT table
 struct IDTR _idt_idtr ={
     .limit = sizeof(struct IDT) - 1,
-    .base = &idt.table[1]
+    .base = &idt.table[0]
 };
 
 // IDTR descriptor

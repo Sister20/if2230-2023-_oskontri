@@ -2,7 +2,7 @@
 #include "fat32.h"
 #include "../lib-header/stdmem.h"
 
-struct FAT32DriverState fat32DriveState;
+struct FAT32DriverState fat32DriveState = {0};
 
 
 const uint8_t fs_signature[BLOCK_SIZE] = {
@@ -22,7 +22,8 @@ void initialize_filesystem_fat32() {
     }
     else{
        // Load filesystem 
-         read_clusters(fat32DriveState.fat_table.cluster_map, 1, 1);
+       read_clusters(&fat32DriveState.fat_table, FAT_CLUSTER_NUMBER, 1);
+        read_clusters(&fat32DriveState.dir_table_buf, ROOT_CLUSTER_NUMBER, 1);
     }
 }
 
@@ -32,12 +33,12 @@ bool is_empty_storage() {
 }
 
 void init_directory_table(struct FAT32DirectoryTable *dir_table, char *name, uint32_t parent_dir_cluster){
-    dir_table->table[0].undelete = 0;
-    dir_table->table[0].create_time = 0;
-    dir_table->table[0].create_date = 0;
-    dir_table->table[0].access_date = 0;
-    dir_table->table[0].modified_time = 0;
-    dir_table->table[0].modified_date = 0;
+    // dir_table->table[0].undelete = 0;
+    // dir_table->table[0].create_time = 0;
+    // dir_table->table[0].create_date = 0;
+    // dir_table->table[0].access_date = 0;
+    // dir_table->table[0].modified_time = 0;
+    // dir_table->table[0].modified_date = 0;
     memcpy(dir_table->table[0].name, name, 8);
     dir_table->table[0].attribute = ATTR_SUBDIRECTORY;
     dir_table->table[0].user_attribute = UATTR_NOT_EMPTY;

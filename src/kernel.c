@@ -148,6 +148,7 @@ void kernel_setup(void) {
     initialize_filesystem_fat32();
     gdt_install_tss();
     set_tss_register();
+    keyboard_state_activate();
 
     // Allocate first 4 MiB virtual memory
     allocate_single_user_page_frame((uint8_t*) 0);

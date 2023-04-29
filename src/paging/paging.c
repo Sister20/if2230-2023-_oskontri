@@ -43,7 +43,7 @@ int8_t allocate_single_user_page_frame(void *virtual_addr) {
     .use_pagesize_4_mb = 1
     }
 );
-    return -1;
+    return 0;
 }
 
 void flush_single_tlb(void *virtual_addr) {

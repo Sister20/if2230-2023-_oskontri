@@ -56,11 +56,16 @@ void pic_remap(void) {
 
 void main_interrupt_handler(struct CPURegister cpu, uint32_t int_number, struct InterruptStack info) {
     switch (int_number) {
-        case PIC1_OFFSET + IRQ_KEYBOARD+1:
+        case 14:
+            __asm__("hlt");
+            break;
+        case PIC1_OFFSET + IRQ_KEYBOARD:
             keyboard_isr();
             break;
         case 0x30:
             syscall(cpu, info);
+            break;
+        default:
             break;
     }
 }
@@ -69,6 +74,7 @@ void syscall(struct CPURegister cpu, __attribute__((unused)) struct InterruptSta
     if (cpu.eax == 0) {
         struct FAT32DriverRequest request = *(struct FAT32DriverRequest*) cpu.ebx;
         *((int8_t*) cpu.ecx) = read(request);
+        // framebuffer_set_cursor(20,20);
     } 
     else if (cpu.eax == 4) {
         keyboard_state_activate();

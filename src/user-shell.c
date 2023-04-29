@@ -18,6 +18,10 @@ void syscall(uint32_t eax, uint32_t ebx, uint32_t ecx, uint32_t edx) {
     __asm__ volatile("int $0x30");
 }
 
+void puts(char *buf, uint32_t len, uint32_t color) {
+    syscall(5, (uint32_t) buf, len, color);
+}
+
 int main(void) {
     struct ClusterBuffer cl           = {0};
     struct FAT32DriverRequest request = {
@@ -34,6 +38,7 @@ int main(void) {
 
     char buf[16];
     while (TRUE) {
+        puts("owo", 3, 0xF);
         syscall(4, (uint32_t) buf, 16, 0);
         syscall(5, (uint32_t) buf, 16, 0xF);
     }
