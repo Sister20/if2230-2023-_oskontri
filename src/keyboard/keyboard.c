@@ -55,9 +55,9 @@ bool is_keyboard_blocking(void){
 }
 
 void keyboard_isr(uint32_t len){
-  framebuffer_write(20,20, 'a' + len, 0x0, 0xFF);
+  // framebuffer_write(20,20, 'a' + len, 0x0, 0xFF);
   if(!keyboard_state.keyboard_input_on){
-    keyboard_state.buffer_index = len;
+    keyboard_state.buffer_index = 0;
   }
 
   else {
@@ -82,12 +82,14 @@ void keyboard_isr(uint32_t len){
                   }
                 }
               }
+
               else if (mapped_char == '\n'){
                 keyboard_state.row++;
                 keyboard_state.col[keyboard_state.row] = 0;
                 framebuffer_set_cursor(keyboard_state.row, keyboard_state.col[keyboard_state.row] + len);
                 keyboard_state_deactivate();
               }
+
               else if (mapped_char != 0){
                 framebuffer_write(keyboard_state.row,keyboard_state.col[keyboard_state.row] + len,mapped_char,0x0F,0x000);
                 keyboard_state.buffer_index++;

@@ -67,10 +67,10 @@ void main_interrupt_handler(struct CPURegister cpu, uint32_t int_number, struct 
             __asm__("hlt");
             break;
         case PIC1_OFFSET + IRQ_KEYBOARD:
+            //   framebuffer_write(20,20, 'a' + cursor.col, 0x0, 0xFF);
             keyboard_isr(cursor.col);
             break;
         case 0x30:
-            cursor.col = cpu.ecx;
             syscall(cpu, info);
             break;
         default:
@@ -99,6 +99,7 @@ void syscall(struct CPURegister cpu, __attribute__((unused)) struct InterruptSta
 }
 
 void puts(char *str, uint32_t len, uint32_t fg) {
+    cursor.col = len;
     for (uint32_t i = 0; i < len; i++) {
         // if(cursor.row > 0){
         //     framebuffer_write(cursor.row/2+1, i, str[i], (uint8_t) fg, (uint8_t) 0x00);
